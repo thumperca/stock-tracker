@@ -1,0 +1,41 @@
+{
+  "name": "stock-tracker",
+  "version": "1.0.0",
+  "description": "This app is to track share market prices of certain shortlisted securities and use Exponential Moving Average (EMA) to find when is the best time to enter or exit a stock.",
+  "private": true,
+  "main": "react/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thumperca/stock-tracker.git"
+  },
+  "scripts": {
+    "start": "npm run build",
+    "build": "webpack -d --watch",
+    "build:prod": "webpack -p"
+  },
+  "author": "Manvir Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thumperca/stock-tracker/issues"
+  },
+  "homepage": "https://github.com/thumperca/stock-tracker#readme",
+  "dependencies": {
+    "axios": "^0.15.3",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.3.2",
+    "babel-plugin-react-html-attrs": "^2.0.0",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.23.0",
+    "babel-preset-stage-2": "^6.22.0",
+    "bower": "^1.3.1",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1"
+  }
+}
