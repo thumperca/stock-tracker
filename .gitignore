@@ -1,4 +1,5 @@
 __pycache__
 *.csv
 node_modules/
+static/libs
 static/bundle.js

@@ -1,0 +1,22 @@
+{
+  "name": "stock-tracker",
+  "description": "This app is to track share market prices of certain shortlisted securities and use Exponential Moving Average (EMA) to find when is the best time to enter or exit a stock.",
+  "main": "react/index.js",
+  "authors": [
+    "Manvir Singh"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/thumperca/stock-tracker",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "static/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
