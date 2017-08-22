@@ -31,9 +31,11 @@ class Command(BaseCommand):
         """Import date from a single CSV file"""
         symbol = file.split('.')[0].upper()
         stock, created = Stock.objects.get_or_create(symbol=symbol)
-        data = []
+        data, existing_data = [], self.get_existing_data(stock)
         for raw_date, price in self.get_row(file, symbol):
             date = datetime.strptime(raw_date, '%d-%b-%Y').date()
+            if existing_data and str(date) in existing_data:
+                continue
             entry = Price(stock=stock, date=date, price=price)
             data.append(entry)
         Price.objects.bulk_create(data, 2000)
@@ -48,3 +50,12 @@ class Command(BaseCommand):
                     continue
                 price = float(row[8].strip())
                 yield (row[2].strip(), price)
+
+    def get_existing_data(self, stock):
+        """
+        Returns dict with existing data for a stock
+        The key is date and value is closing stock price
+        """
+
+        data = Price.objects.filter(stock=stock)
+        return {str(entry.date): entry.price for entry in data}
