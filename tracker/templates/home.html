@@ -4,9 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Homepage</title>
+    <link rel="stylesheet" href="{% static 'libs/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
     <div id="app"></div>
+    <!--    ChartJS     -->
+    <script src="{% static 'libs/chartjs/Chart.bundle.min.js' %}"></script>
+    <script>
+        Chart.defaults.global.elements.line.fill = false;
+        Chart.defaults.global.elements.line.borderWidth = 2;
+    </script>
+    <!--    ReactJS bundle     -->
     <script src="{% static 'bundle.js' %}"></script>
 </body>
 </html>

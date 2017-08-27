@@ -1,0 +1,29 @@
+a:hover {
+    text-decoration: none;
+}
+
+nav {
+    border-bottom: 1px solid #eee;
+    background: #fcfcfc;
+}
+
+nav img {
+    height: 50px;
+    width: auto;
+}
+
+nav a {
+    line-height: 50px;
+    margin-left: 1.2em;
+    color: #999;
+    font-size: 1.1em;
+}
+
+nav a:hover {
+    color: #333;
+}
+
+nav a.active {
+    color: #333;
+    border-bottom: 1px solid #aaa;
+}
