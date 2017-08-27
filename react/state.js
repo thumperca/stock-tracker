@@ -1,6 +1,6 @@
 const state = {
 
-    view: 'shortlist'
+    view: 'Portfolio'
 
 }
 

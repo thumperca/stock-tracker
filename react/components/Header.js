@@ -1,22 +1,40 @@
 import React from 'React';
+import { connect } from 'react-redux';
 
+const Header = props => {
 
-export default class Header extends React.Component {
+    const options = ['Portfolio', 'Shortlist'];
+    const btns = options.map((option, i) => {
+        const elmclass = option == props.view ? 'active' : '';
+        return <a key={i} href="" onClick={e => props.change(e, option)} class={elmclass}>{option}</a>
+    })
 
-    render() {
-        return (
-            <nav class="clearfix">
-                <div class="container">
-                    <div class="pull-left">
-                        <img src="/static/logo.png" />
-                    </div>
-                    <div class="pull-right">
-                        <a href="" class="active">Portfolio</a>
-                        <a href="">Shortlist</a>
-                    </div>
+    return (
+        <nav class="clearfix">
+            <div class="container">
+                <div class="pull-left">
+                    <img src="/static/logo.png" />
                 </div>
-            </nav>
-        )
-    }
+                <div class="pull-right">
+                   {btns}
+                </div>
+            </div>
+        </nav>
+    )
 
 }
+
+const mapStateToProps = state => {
+    return {view: state.view}
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        change: (event, option) => {
+            event.preventDefault();
+            dispatch({type: 'TYPE_CHANGE', payload: option})
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header)

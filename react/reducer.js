@@ -2,10 +2,12 @@ import initalState from "./state";
 
 const reducer = (state=initalState, action) => {
 
+    const { payload } = action;
+
     switch ( action.type ) {
 
-        case "PAGE_CHANGE":
-            state = {...state, page:action.payload};
+        case "TYPE_CHANGE":
+            state = {...state, view: payload};
             break;
 
     }
