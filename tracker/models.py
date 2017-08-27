@@ -1,7 +1,8 @@
 from django.db import models
+from tracker.mixins import StockMixin
 
 
-class Stock(models.Model):
+class Stock(models.Model, StockMixin):
     symbol = models.CharField(max_length=20, primary_key=True)
     added_on = models.DateField(auto_now_add=True)
     modified_on = models.DateField(auto_now=True)
