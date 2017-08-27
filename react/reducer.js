@@ -10,6 +10,10 @@ const reducer = (state=initalState, action) => {
             state = {...state, view: payload};
             break;
 
+        case "SELECT":
+            state = {...state, stock: payload};
+            break;
+
     }
     return state;
 }

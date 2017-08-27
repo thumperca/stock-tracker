@@ -1,7 +1,6 @@
 const state = {
-
-    view: 'Portfolio'
-
+    view: 'Portfolio',
+    stock: null,
 }
 
 export default state;

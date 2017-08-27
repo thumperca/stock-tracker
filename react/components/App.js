@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import Header from './Header';
 import List from './List';
+import Graph from './Graph';
 
 class App extends React.Component {
 
@@ -11,6 +12,7 @@ class App extends React.Component {
             <div>
                 <Header/>
                 <List/>
+                <Graph/>
             </div>
         )
     }
