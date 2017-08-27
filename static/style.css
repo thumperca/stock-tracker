@@ -2,6 +2,9 @@ a:hover, a:focus, a:active {
     text-decoration: none;
 }
 
+/*********************************************
+*            Header styles
+*********************************************/
 nav {
     border-bottom: 1px solid #eee;
     background: #fcfcfc;
@@ -27,3 +30,40 @@ nav a.active {
     color: #333;
     border-bottom: 1px solid #aaa;
 }
+
+/*********************************************
+*            List Styles
+*********************************************/
+h2 {
+    margin-bottom: 1em;
+}
+
+.list .item > * {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.list .symbol {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.list .item {
+    padding-top: .8em;
+    padding-bottom: .8em;
+}
+
+.list .item:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    background: #f6f6f6;
+}
+
+.list .up {
+    color: green;
+}
+
+.list .down {
+    color: red;
+}
+
