@@ -79,10 +79,10 @@ class StockMixin(object):
         return ema
 
     def _limit_to_days(self, data, response, period):
+        """Limit response data to certain timeperiod"""
         offset_date = self._get_offset_date(period)
-        if not offset_date:
-            return self._balance_data(data, response)
-
+        if offset_date:
+            data = data.filter(date__gte=offset_date)
         return self._balance_data(data, response)
 
     def _get_offset_date(self, period):
@@ -114,14 +114,21 @@ class StockMixin(object):
 
         def correct_size(data, size):
             length = len(data)
-            if length == size:
-                return data
-            data.reverse()
-            for i in range(size - length):
-                data.append(None)
-            data.reverse()
+            #   more data available then needed
+            #   trim data down to optimal size
+            if length > size:
+                extra = length - size
+                data = data[extra:]
+            #   some data is missing
+            #   extra padding is needed to align graph properly
+            elif length < size:
+                data.reverse()
+                for i in range(size - length):
+                    data.append(None)
+                data.reverse()
             return data
 
+        response['prices'] = correct_size(response['prices'], size)
         response['long'] = correct_size(response['long'], size)
         response['mid'] = correct_size(response['mid'], size)
         response['short'] = correct_size(response['short'], size)
