@@ -23,5 +23,5 @@ def stock(request, symbol):
         stock = Stock.objects.get(pk=symbol)
     except Stock.DoesNotExist:
         return JsonResponse({'failed': True}, status=404)
-    stats = stock.get_graph()
+    stats = stock.get_graph(period=request.GET.get('t'))
     return JsonResponse(stats)
