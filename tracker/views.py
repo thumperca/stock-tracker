@@ -16,3 +16,12 @@ def stocks(request):
     stocks = stocks.order_by('symbol')
     data = [stock.to_overview() for stock in stocks]
     return JsonResponse(data, safe=False)
+
+
+def stock(request, symbol):
+    try:
+        stock = Stock.objects.get(pk=symbol)
+    except Stock.DoesNotExist:
+        return JsonResponse({'failed': True}, status=404)
+    stats = stock.get_graph()
+    return JsonResponse(stats)
