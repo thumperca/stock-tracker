@@ -70,3 +70,11 @@ h2 {
 .modal-dialog {
     width: 80% !important;
 }
+
+.modal h4 {
+    display: inline-block;
+}
+
+.modal button {
+    margin-left: 1em;
+}

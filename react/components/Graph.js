@@ -5,16 +5,30 @@ import { connect } from 'react-redux';
 
 class Graph extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {period: '1Y', loading: false}
+    }
+
     componentDidMount(props) {
         if ( !props ) props = this.props;
         const { stock } = props;
         if ( !stock ) return;
-        axios.get(`/api/stock/${stock}/`).then(res => this.loadGraph(res.data))
+        this.setState({loading: true});
+        axios.get(`/api/stock/${stock}/?t=${this.state.period}`).then(res => {
+            this.setState({loading: false});
+            this.loadGraph(res.data)
+        })
     }
 
     componentWillReceiveProps(nextProps) {
         if ( nextProps.stock == this.props.stock ) return;
         this.componentDidMount(nextProps);
+    }
+
+    changePeriod(period) {
+        this.setState({period: period, loading: true})
+        setTimeout(this.componentDidMount.bind(this), 200);
     }
 
     loadGraph(data) {
@@ -29,7 +43,6 @@ class Graph extends React.Component {
                         label: 'Price',
                         borderColor: '#bbb',
                         fill: true,
-                        borderWidth: 1,
                         pointStyle: 'line',
                     },
                     {
@@ -67,13 +80,24 @@ class Graph extends React.Component {
     render() {
         const { stock } = this.props;
         if ( !stock ) return null;
+
+        if ( this.state.loading ) return null;
+
+        const periodOptions = ['1W', '1M', '3M', '6M', '1Y', '2Y', 'Max'];
+        const periods = periodOptions.map((period, i) => {
+            const postfix = (this.state.period == period) ? 'primary' : 'default';
+            const elmClass = 'btn btn-xs btn-' + postfix;
+            return (<button type="button" onClick={e => this.changePeriod(period)} class={elmClass}>{period}</button>);
+        })
+
         return (
             <div class="modal fade in" style={{'display': 'block'}}>
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-body">
                             <button type="button" class="close" onClick={e => this.props.close()}>&times;</button>
-                            <h4>Graph for {stock}</h4>
+                            <h4>Graph for {stock} - </h4>
+                            { periods }
                             <canvas id="chart"></canvas>
                         </div>
                     </div>
