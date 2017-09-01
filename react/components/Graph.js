@@ -33,6 +33,8 @@ class Graph extends React.Component {
 
     loadGraph(data) {
         const elm = document.getElementById('chart');
+        const hide = ['1Y', '2Y', 'Max'];
+        const pointRadius = hide.indexOf(this.state.period) == -1 ? 2 : 0.5;
         new Chart(elm, {
             type: 'line',
             data: {
@@ -43,25 +45,25 @@ class Graph extends React.Component {
                         label: 'Price',
                         borderColor: '#bbb',
                         fill: true,
-                        pointStyle: 'line',
+                        pointRadius: pointRadius,
                     },
                     {
                         data: data.short,
                         label: 'EMA(10)',
                         borderColor: '#85a',
-                        pointStyle: 'line',
+                        pointRadius: pointRadius,
                     },
                     {
                         data: data.mid,
                         label: 'EMA(50)',
                         borderColor: '#3b9',
-                        pointStyle: 'line',
+                        pointRadius: pointRadius,
                     },
                     {
                         data: data.long,
                         label: 'EMA(200)',
                         borderColor: '#c55',
-                        pointStyle: 'line',
+                        pointRadius: pointRadius,
                     },
                 ]
             },
