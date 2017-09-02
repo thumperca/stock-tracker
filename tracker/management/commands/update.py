@@ -31,7 +31,7 @@ class Command(BaseCommand):
         self.update_stock(stock, quote)
 
     def update_stock(self, stock, quote):
-        if quote['date'] == stock.modified_on and quote['price'] == stock.last_price:
+        if quote['date'] == stock.modified_on and quote['price'] == float(stock.last_price):
             return
         stock.last_price = quote['price']
         stock.save()
