@@ -28,7 +28,14 @@ class Command(BaseCommand):
         if not quote or not quote['price']:
             print('invalid quote')
             return
-        print(quote['date'], quote['price'])
+        self.update_stock(stock, quote)
+
+    def update_stock(self, stock, quote):
+        if quote['date'] == stock.modified_on and quote['price'] == stock.last_price:
+            return
+        stock.last_price = quote['price']
+        stock.save()
+        Price.objects.create(stock=stock, date=quote['date'], price=quote['price'])
 
     def get_stock_quote(self, symbol, retry=0):
         if not retry:
@@ -48,8 +55,10 @@ class Command(BaseCommand):
         quote = self.parse_response(response)
         if not quote:
             return
+        price = float(quote['data'][0]['closePrice'].replace(',', ''))
+        if not price:
+            return
         date = datetime.strptime(quote['tradedDate'], '%d%b%Y').date()
-        price = quote['data'][0]['closePrice']
         return {'date': date, 'price': price}
 
     def parse_response(self, response):
