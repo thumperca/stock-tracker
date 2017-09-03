@@ -10,6 +10,6 @@ class Stock(models.Model, StockMixin):
 
 
 class Price(models.Model):
-    stock = models.ForeignKey(Stock)
+    stock = models.ForeignKey(Stock, db_column='symbol')
     date = models.DateField()
     price = models.DecimalField(max_digits=9, decimal_places=2)
