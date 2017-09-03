@@ -2,32 +2,7 @@ import React from 'React';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
-
-//  Overview for a single stock
-const StockOverview = props => {
-    //  Stock statistics
-    const stats = props.stats.map((stat, i) => {
-        const elmClass = 'stat ' + stat.direction;
-        const symbol = stat.direction == 'up' ? '+' : '-';
-        return <div class={elmClass} key={i}>{symbol}{stat.difference}% ({stat.days})</div>
-    })
-    //  return JSX
-    return (
-        <div class="item col-sm-6" onClick={e => props.select(props.symbol)}>
-            <div class="symbol">{props.symbol}</div>
-            { stats }
-            {/*<div class="balance up">+300.64</div>*/}
-        </div>
-    )
-}
-
-const mapDispatchToProps = dispatch => {
-    return {
-        select: stock => dispatch({type: 'SELECT', payload: stock})
-    }
-}
-
-const Stock = connect(null, mapDispatchToProps)(StockOverview);
+import List from './shared/List';
 
 
 export default class Home extends React.Component {
@@ -57,17 +32,14 @@ export default class Home extends React.Component {
     }
 
     render() {
+        const { stocks, loading } = this.state;
         //  Page loading
-        if ( this.state.loading ) return 'Loading...';
-        //  Single Stock entry
-        const stocks = this.state.stocks.map((stock, i) => <Stock {...stock} key={i} />)
+        if ( loading ) return <h3>Loading...</h3>;
         //  Main JSX
         return (
             <div class="container">
                 <h2>Stocks in Shortlist</h2>
-                <div class="list row">
-                    { stocks }
-                </div>
+                <List stocks={stocks} />
             </div>
         )
     }
