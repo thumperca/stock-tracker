@@ -1,5 +1,4 @@
 const state = {
-    view: 'Portfolio',
     stock: null,
 }
 

@@ -1,27 +1,30 @@
 import React from 'react';
+import { Router, Route, browserHistory } from 'react-router';
 import { connect } from 'react-redux';
 
-import Header from './Header';
-import List from './List';
-import Graph from './Graph';
+import Header from './shared/Header';
+import Graph from './shared/Graph';
 
-class App extends React.Component {
+import Home from './pages/Home';
 
-    render() {
-        return (
-            <div>
-                <Header/>
-                <List/>
-                <Graph/>
-            </div>
-        )
-    }
-
+const BaseLayout = props => {
+    return (
+        <div>
+            <Header/>
+            {props.children}
+            <Graph/>
+        </div>
+    )
 }
 
-
-const mapStateToProps = state => {
-    return {page: state.view}
+const App = props => {
+    return (
+        <Router history={browserHistory}>
+                <Route component={BaseLayout}>
+                    <Route path="/" name="home" component={Home} />
+                </Route>
+        </Router>
+    )
 }
 
-export default connect(mapStateToProps)(App);
+export default App;

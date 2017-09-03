@@ -30,7 +30,7 @@ const mapDispatchToProps = dispatch => {
 const Stock = connect(null, mapDispatchToProps)(StockOverview);
 
 
-class List extends React.Component {
+export default class Home extends React.Component {
 
     constructor(props) {
         super(props);
@@ -64,7 +64,7 @@ class List extends React.Component {
         //  Main JSX
         return (
             <div class="container">
-                <h2>Stocks in {this.props.page}</h2>
+                <h2>Stocks in Shortlist</h2>
                 <div class="list row">
                     { stocks }
                 </div>
@@ -73,10 +73,3 @@ class List extends React.Component {
     }
 
 }
-
-
-const mapStateToProps = state => {
-    return {page: state.view}
-}
-
-export default connect(mapStateToProps)(List);
