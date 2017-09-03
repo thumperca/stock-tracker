@@ -17,6 +17,14 @@ class StockMixin(object):
             ]
         }
 
+    def is_below_ema(self, period):
+        """Check that a stock is under certain it EMA for given period of days"""
+        orm = tracker.models.Price.objects
+        data = orm.filter(stock=self).order_by('date').values_list('price', flat=True)
+        prices = [float(price) for price in data]
+        ema = self._get_ema(prices, period)
+        return ema[-1] > prices[-1]
+
     def _get_difference(self, data, days):
         """Returns stocks difference details between current price and historic price"""
         if not len(data):

@@ -1,5 +1,6 @@
 from django.db import models
 from tracker.mixins import StockMixin
+from tracker.managers import StockManger
 
 
 class Stock(models.Model, StockMixin):
@@ -7,6 +8,8 @@ class Stock(models.Model, StockMixin):
     last_price = models.DecimalField(max_digits=9, decimal_places=2, null=True)
     added_on = models.DateField(auto_now_add=True)
     modified_on = models.DateField(auto_now=True)
+
+    objects = StockManger()
 
 
 class Price(models.Model):

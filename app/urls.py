@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/stocks$', views.stocks),
     url(r'^api/stock/(?P<symbol>.*)/$', views.stock),
+    url(r'^api/screener$', views.screener),
     url(r'^', views.home),
 ]
