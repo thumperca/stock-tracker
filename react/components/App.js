@@ -6,6 +6,7 @@ import Header from './shared/Header';
 import Graph from './shared/Graph';
 
 import Home from './pages/Home';
+import Screener from './pages/Screener';
 
 const BaseLayout = props => {
     return (
@@ -22,6 +23,7 @@ const App = props => {
         <Router history={browserHistory}>
                 <Route component={BaseLayout}>
                     <Route path="/" name="home" component={Home} />
+                    <Route path="/screener" name="screener" component={Screener} />
                 </Route>
         </Router>
     )

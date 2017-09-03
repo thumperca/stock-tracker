@@ -1,13 +1,8 @@
 import React from 'React';
+import { Link } from 'react-router';
 import { connect } from 'react-redux';
 
 const Header = props => {
-
-    const options = ['Portfolio', 'Shortlist'];
-    const btns = options.map((option, i) => {
-        const elmclass = option == props.view ? 'active' : '';
-        return <a key={i} href="" onClick={e => props.change(e, option)} class={elmclass}>{option}</a>
-    })
 
     return (
         <nav class="clearfix">
@@ -16,7 +11,8 @@ const Header = props => {
                     <img src="/static/logo.png" />
                 </div>
                 <div class="pull-right">
-                   {btns}
+                   <Link to="/" activeClassName="active">Shortlist</Link>
+                   <Link to="/screener" activeClassName="active">Screener</Link>
                 </div>
             </div>
         </nav>
@@ -24,17 +20,4 @@ const Header = props => {
 
 }
 
-const mapStateToProps = state => {
-    return {view: state.view}
-}
-
-const mapDispatchToProps = dispatch => {
-    return {
-        change: (event, option) => {
-            event.preventDefault();
-            dispatch({type: 'TYPE_CHANGE', payload: option})
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Header)
+export default Header;
