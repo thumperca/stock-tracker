@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
     def import_data(self, file):
         """Import date from a single CSV file"""
-        symbol = file.split('.')[0].upper()
+        symbol = self.get_symbol(file)
         stock, created = Stock.objects.get_or_create(symbol=symbol)
         data, existing_data = [], self.get_existing_data(stock)
         for raw_date, price in self.get_row(file, symbol):
@@ -40,13 +40,22 @@ class Command(BaseCommand):
             data.append(entry)
         Price.objects.bulk_create(data, 2000)
 
+    def get_symbol(self, file):
+        """Get stock symbol from file name"""
+        if len(file) < 30 or 'ALLN' not in file or '-TO-' not in file:
+            raise Exception('File name incorrect')
+        name = file.split('.')[0].upper()
+        name = name.replace('ALLN', '')
+        name = name[24:]
+        return name
+
     def get_row(self, file, symbol):
         """Generator method to get a row from CSV file"""
         file_path = os.path.join(IMPORT_DIR, file)
         with open(file_path, 'r') as f:
             reader = csv.reader(f, delimiter=',')
             for row in reader:
-                if row[0] != symbol:
+                if row[0] != symbol or row[1] != 'EQ':
                     continue
                 price = float(row[8].strip())
                 yield (row[2].strip(), price)
