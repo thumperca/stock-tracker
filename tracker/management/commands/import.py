@@ -55,7 +55,8 @@ class Command(BaseCommand):
         with open(file_path, 'r') as f:
             reader = csv.reader(f, delimiter=',')
             for row in reader:
-                if row[0] != symbol or row[1] != 'EQ':
+                row_symbol = row[0].replace('&amp;', '&')
+                if row_symbol != symbol or row[1] != 'EQ':
                     continue
                 price = float(row[8].strip())
                 yield (row[2].strip(), price)
@@ -65,6 +66,5 @@ class Command(BaseCommand):
         Returns dict with existing data for a stock
         The key is date and value is closing stock price
         """
-
         data = Price.objects.filter(stock=stock)
         return {str(entry.date): entry.price for entry in data}
