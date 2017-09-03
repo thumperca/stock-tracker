@@ -8,23 +8,30 @@ export default class Screener extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {ema: '200', stocks: []}
+        this.state = {loading: false, ema: null, stocks: []}
+    }
+
+    componentDidMount() {
+        this.change(null, '200');
     }
 
     change(event, ema) {
-        event.preventDefault();
-        this.setState({ema: ema});
+        if ( event ) event.preventDefault();
+        if ( ema == this.state.ema ) return;
+        this.setState({ema: ema, loading: true});
+        axios.get('/api/screener?q='+ema).then(res =>this.setState({loading: false, stocks: res.data}))
     }
 
     render() {
-        const { loading, stocks } = this.state;
+        const { loading, stocks, ema } = this.state;
+        if ( !ema ) return null;
 
         const emas = ['50', '100', '200'];
-        const tabs = emas.map((ema, i) => {
-            const elmClass = ema == this.state.ema ? 'active' : null;
+        const tabs = emas.map((em) => {
+            const elmClass = em == this.state.ema ? 'active' : null;
             return (
-                <li class={elmClass}>
-                    <a href="#" onClick={e => this.change(e, ema)}>{ema}</a>
+                <li class={elmClass} key={em}>
+                    <a href="#" onClick={e => this.change(e, em)}>{em}</a>
                 </li>
             )
         })
