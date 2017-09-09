@@ -9,7 +9,7 @@ const StockOverview = props => {
     const stats = props.stats.map((stat, i) => {
         const elmClass = 'stat ' + stat.direction;
         const symbol = stat.direction == 'up' ? '+' : '-';
-        return <div class={elmClass} key={i}>{symbol}{stat.difference}% ({stat.days})</div>
+        return <div class={elmClass} key={i}>{symbol}{stat.difference}% ({stat.months}M)</div>
     })
     //  return JSX
     return (
