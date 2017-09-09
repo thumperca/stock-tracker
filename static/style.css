@@ -65,6 +65,10 @@ h2 {
     color: red;
 }
 
+#quick-search {
+    margin-bottom: 2em;
+}
+
 .signal-info {
     margin-bottom: 1em;
     padding: 0 .8em;
