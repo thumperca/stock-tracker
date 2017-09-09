@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 
 from tracker.models import Stock
+from tracker.utils import Signals
 
 
 def home(request):
@@ -33,4 +34,10 @@ def screener(request):
         return HttpResponse('Invalid request', status=400)
     stocks = Stock.objects.below_ema(days=int(ema))
     data = [stock.to_overview() for stock in stocks]
+    return JsonResponse(data, safe=False)
+
+
+def signals(request):
+    signals = Signals()
+    data = signals.find()
     return JsonResponse(data, safe=False)
