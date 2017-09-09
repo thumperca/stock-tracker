@@ -11,9 +11,10 @@ const StockOverview = props => {
         const symbol = stat.direction == 'up' ? '+' : '-';
         return <div class={elmClass} key={i}>{symbol}{stat.difference}% ({stat.months}M)</div>
     })
+    const className = props.className ? props.className : 'item col-sm-6'
     //  return JSX
     return (
-        <div class="item col-sm-6" onClick={e => props.select(props.symbol)}>
+        <div class={className} onClick={e => props.select(props.symbol)}>
             <div class="symbol">{props.symbol}</div>
             { stats }
             {/*<div class="balance up">+300.64</div>*/}
@@ -27,7 +28,7 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-const Stock = connect(null, mapDispatchToProps)(StockOverview);
+export const Stock = connect(null, mapDispatchToProps)(StockOverview);
 
 
 const List = props => {
