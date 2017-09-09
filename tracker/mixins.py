@@ -2,20 +2,7 @@ from datetime import date, timedelta
 import tracker.models
 
 
-class StockMixin(object):
-
-    def to_overview(self):
-        """Basic performance overview of a stock"""
-        orm = tracker.models.Price.objects
-        data = orm.filter(stock=self).order_by('-date').values_list('price', flat=True)[:200]
-        return {
-            'symbol': self.symbol,
-            'stats': [
-                self._get_difference(data=data, days=10),
-                self._get_difference(data=data, days=50),
-                self._get_difference(data=data, days=200),
-            ]
-        }
+class EMAOperations(object):
 
     def is_below_ema(self, period):
         """Check that a stock is under certain it EMA for given period of days"""
@@ -24,40 +11,6 @@ class StockMixin(object):
         prices = [float(price) for price in data]
         ema = self._get_ema(prices, period)
         return ema[-1] > prices[-1]
-
-    def _get_difference(self, data, days):
-        """Returns stocks difference details between current price and historic price"""
-        if not len(data):
-            return {'days': days, 'direction': None}
-        if len(data) < days:
-            return {'days': days, 'direction': None}
-        new = data[0]
-        old = data[days - 1]
-        if new > old:
-            direction = 'up'
-            difference = round((new / old - 1) * 100, 1)
-        else:
-            direction = 'down'
-            difference = round((1 - new / old) * 100, 1)
-        return {'days': days, 'direction': direction, 'difference': difference}
-
-    def get_graph(self, period=None):
-        """Returns data to populate detailed EMA graph for a stock"""
-        orm = tracker.models.Price.objects
-        data = orm.filter(stock=self).order_by('date').values('date', 'price')
-        prices = [float(entry['price']) for entry in data]
-        ema_short = self._get_ema(prices, 10)
-        ema_mid = self._get_ema(prices, 50)
-        ema_long = self._get_ema(prices, 200)
-        # labels = [entry['date'].strftime('%d-%m-%Y') for entry in data]
-        response = {
-            # 'labels': labels,
-            'prices': prices,
-            'short': ema_short,
-            'mid': ema_mid,
-            'long': ema_long,
-        }
-        return self._limit_to_days(data=data, response=response, period=period)
 
     def _get_ema(self, data, period):
         """
@@ -85,6 +38,27 @@ class StockMixin(object):
         #     extra = len(ema) - 200
         #     ema = ema[extra:]
         return ema
+
+
+class Graph(EMAOperations):
+
+    def get_graph(self, period=None):
+        """Returns data to populate detailed EMA graph for a stock"""
+        orm = tracker.models.Price.objects
+        data = orm.filter(stock=self).order_by('date').values('date', 'price')
+        prices = [float(entry['price']) for entry in data]
+        ema_short = self._get_ema(prices, 10)
+        ema_mid = self._get_ema(prices, 50)
+        ema_long = self._get_ema(prices, 200)
+        # labels = [entry['date'].strftime('%d-%m-%Y') for entry in data]
+        response = {
+            # 'labels': labels,
+            'prices': prices,
+            'short': ema_short,
+            'mid': ema_mid,
+            'long': ema_long,
+        }
+        return self._limit_to_days(data=data, response=response, period=period)
 
     def _limit_to_days(self, data, response, period):
         """Limit response data to certain timeperiod"""
@@ -143,3 +117,36 @@ class StockMixin(object):
 
         response['labels'] = labels
         return response
+
+
+class StockMixin(Graph):
+
+    def to_overview(self):
+        """Basic performance overview of a stock"""
+        orm = tracker.models.Price.objects
+        data = orm.filter(stock=self).order_by('-date').values_list('price', flat=True)[:200]
+        return {
+            'symbol': self.symbol,
+            'stats': [
+                self._get_difference(data=data, months=3),
+                self._get_difference(data=data, months=6),
+                self._get_difference(data=data, months=12),
+            ]
+        }
+
+    def _get_difference(self, data, months):
+        """Returns stocks difference details between current price and historic price"""
+        days = months * 30
+        if not len(data):
+            return {'days': days, 'direction': None}
+        if len(data) < (months * 30):
+            return {'days': days, 'direction': None}
+        new = data[0]
+        old = data[days - 1]
+        if new > old:
+            direction = 'up'
+            difference = round((new / old - 1) * 100, 1)
+        else:
+            direction = 'down'
+            difference = round((1 - new / old) * 100, 1)
+        return {'days': days, 'direction': direction, 'difference': difference}
