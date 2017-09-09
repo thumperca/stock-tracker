@@ -34,7 +34,7 @@ class Command(BaseCommand):
         if quote['date'] == stock.modified_on and quote['price'] == float(stock.last_price):
             return
         stock.last_price = quote['price']
-        stock.save()
+        stock.save(modified_on=quote['date'])
         Price.objects.create(stock=stock, date=quote['date'], price=quote['price'])
 
     def get_stock_quote(self, symbol, retry=0):
@@ -43,7 +43,7 @@ class Command(BaseCommand):
         elif retry > MAX_RETRIES:
             return
         url = ('https://www.nseindia.com/live_market/dynaContent/live_watch/'
-               'get_quote/GetQuote.jsp?symbol={}'.format(symbol))
+               'get_quote/GetQuote.jsp?symbol={}'.format(symbol.replace('&', '%26')))
         response = requests.get(url)
         if response.status_code != 200:
             print('failed with response', response.status_code)
@@ -55,7 +55,10 @@ class Command(BaseCommand):
         quote = self.parse_response(response)
         if not quote:
             return
-        price = float(quote['data'][0]['closePrice'].replace(',', ''))
+        try:
+            price = float(quote['data'][0]['closePrice'].replace(',', ''))
+        except IndexError:
+            return
         if not price:
             return
         date = datetime.strptime(quote['tradedDate'], '%d%b%Y').date()
