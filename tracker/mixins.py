@@ -10,6 +10,8 @@ class EMAOperations(object):
         data = orm.filter(stock=self).order_by('date').values_list('price', flat=True)
         prices = [float(price) for price in data]
         ema = self._get_ema(prices, period)
+        if not ema or not prices:
+            return False
         return ema[-1] > prices[-1]
 
     def _get_ema(self, data, period):
