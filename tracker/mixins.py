@@ -24,6 +24,8 @@ class EMAOperations(object):
             list of Exponential Moving Average for a given period
 
         """
+        if len(data) < period:
+            return []
         ema = []
         j = 1
         sma = sum(data[:period]) / period

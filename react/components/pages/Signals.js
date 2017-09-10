@@ -26,8 +26,8 @@ export default class Signals extends React.Component {
         } else {
             page = stocks.map((stock, i) => {
                 return (
-                    <div class="col-sm-6">
-                        <Stock className="item" {...stock} key={i} />
+                    <div class="col-sm-6" key={i}>
+                        <Stock className="item" {...stock} />
                         <div class="signal-info">
                             <span>Short: {stock.signals.short || '-'}</span>
                             <span>Long: {stock.signals.long || '-'}</span>

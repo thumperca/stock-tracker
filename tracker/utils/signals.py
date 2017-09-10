@@ -40,6 +40,8 @@ class Signals(EMAOperations):
         return data
 
     def __inspect_stock(self, prices):
+        if not prices:
+            return None, None
         ema_short = self._get_ema(prices, 10)[-10:]
         ema_mid = self._get_ema(prices, 50)[-10:]
         ema_long = self._get_ema(prices, 200)[-10:]
@@ -48,6 +50,8 @@ class Signals(EMAOperations):
         return (signal_short, signal_long)
 
     def __find_intersection(self, shorter, longer):
+        if not shorter or not longer:
+            return None
         initial_trend = (shorter[0] > longer[0])
         signal = None
         for x, y in zip(shorter, longer):
