@@ -176,4 +176,4 @@ class StockMixin(Graph):
         try:
             return data[target.strftime('%d-%m-%Y')]
         except KeyError:
-            return self.__get_price(data, months, offset=1)
+            return self.__get_price(data, months, offset=((offset or 0) + 1))
