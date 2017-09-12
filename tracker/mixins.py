@@ -33,7 +33,10 @@ class EMAOperations(object):
         sma = sum(data[:period]) / period
         multiplier = 2 / float(1 + period)
         ema.append(sma)
-        ema.append(((data[period] - sma) * multiplier) + sma)
+        try:
+            ema.append(((data[period] - sma) * multiplier) + sma)
+        except IndexError:
+            return []
         for i in data[period + 1:]:
             tmp = ((i - ema[j]) * multiplier) + ema[j]
             j += 1
