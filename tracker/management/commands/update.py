@@ -1,73 +1,127 @@
 """
-Daily updation of stock prices
-This script should be run each day after market closes
-ideally b/w 4pm to 8pm IST
-
+Script to crawl NSE website and get historic prices for last two years
 """
-import json
-from datetime import datetime
+
+#   Core Python dependencies
+import sys
+import datetime
+from zipfile import ZipFile, BadZipfile
+from io import BytesIO
+
+#   Third party dependencies
 import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+
+#   Django framework dependencies
 from django.core.management.base import BaseCommand
+
+#   App based dependencies
 from tracker.models import Stock, Price
 
 
-MAX_RETRIES = 3
+class ArchiveReader(object):
+
+    def read_archive(self, date):
+        url = self.get_url(date)
+        if not url:
+            return
+        return self.read_url(url)
+
+    def get_url(self, date):
+        url = ('https://www.nseindia.com/ArchieveSearch?h_filetype=eqbhav'
+               '&date={}&section=EQ'.format(date.strftime('%d-%m-%Y')))
+        response = requests.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        anchor = soup.find('a')
+        if not anchor:
+            print('no data for date', date)
+            return
+        return 'https://www.nseindia.com' + anchor['href']
+
+    def read_url(self, url):
+        filename = url.split('/')[-1].replace('.zip', '')
+        response = requests.get(url)
+        try:
+            file = ZipFile(BytesIO(response.content))
+            with file.open(filename) as f:
+                data = pd.read_csv(f, header=0, delimiter=',')
+        except BadZipfile:
+            print('failed to read zip file')
+            return
+        else:
+            return data
 
 
-class Command(BaseCommand):
+class ArchiveImporter(ArchiveReader):
 
-    help = 'Daily updation of stock prices'
+    def import_archive(self, date):
+        dataset = self.read_archive(date)
+        if dataset is None:
+            return
+        self.import_data(date, dataset)
+
+    def import_data(self, date, dataset):
+        stocks, data = [], []
+        for quote in self.iter_data(dataset):
+            if quote['symbol'] not in self.stocks:
+                self.add_stock(quote)
+            data.append(Price(
+                stock_id=quote['symbol'],
+                price=quote['price'],
+                quantity=quote['quantity'],
+                date=date,
+            ))
+            stocks.append(quote['symbol'])
+        Price.objects.bulk_create(data)
+        Stock.objects.filter(pk__in=stocks).update(modified_on=date)
+
+    def iter_data(self, dataset):
+        for index, row in dataset.iterrows():
+            if row['SERIES'] != 'EQ':
+                continue
+            data = {
+                'symbol': row['SYMBOL'],
+                'price': row['CLOSE'],
+                'quantity': row['TOTTRDQTY']
+            }
+            yield data
+
+
+class ArchiveProcessor(ArchiveImporter):
+
+    def __init__(self):
+        self.stocks = set(Stock.objects.all().values_list('symbol', flat=True))
+
+    def add_stock(self, quote):
+        stock = Stock(symbol=quote['symbol'], last_price=quote['price'])
+        stock.save()
+        self.stocks.add(stock.pk)
+
+
+class Command(ArchiveProcessor, BaseCommand):
+
+    help = 'Import historic prices from NSE website'
 
     def handle(self, *args, **options):
         """Handle script execution"""
-        for stock in Stock.objects.all():
-            self.process_stock(stock)
+        date, end_date = self.get_dates()
+        if not date:
+            sys.exit('Up to date')
+        while date <= end_date:
+            print('\nprocessing date', date)
+            self.import_archive(date)
+            date += datetime.timedelta(days=1)
 
-    def process_stock(self, stock):
-        quote = self.get_stock_quote(stock.symbol)
-        if not quote or not quote['price']:
-            print('invalid quote')
-            return
-        self.update_stock(stock, quote)
-
-    def update_stock(self, stock, quote):
-        if quote['date'] == stock.modified_on and quote['price'] == float(stock.last_price):
-            return
-        stock.last_price = quote['price']
-        stock.save(modified_on=quote['date'])
-        Price.objects.create(stock=stock, date=quote['date'], price=quote['price'])
-
-    def get_stock_quote(self, symbol, retry=0):
-        if not retry:
-            print('\nGetting updates for stock', symbol)
-        elif retry > MAX_RETRIES:
-            return
-        url = ('https://www.nseindia.com/live_market/dynaContent/live_watch/'
-               'get_quote/GetQuote.jsp?symbol={}'.format(symbol.replace('&', '%26')))
-        response = requests.get(url)
-        if response.status_code != 200:
-            print('failed with response', response.status_code)
-            return self.get_stock_quote(symbol=symbol, retry=(retry + 1))
-        print('success')
-        return self.get_quote(response)
-
-    def get_quote(self, response):
-        quote = self.parse_response(response)
-        if not quote:
-            return
+    def get_dates(self):
         try:
-            price = float(quote['data'][0]['closePrice'].replace(',', ''))
+            price = Price.objects.all().order_by('-id')[0]
         except IndexError:
-            return
-        if not price:
-            return
-        date = datetime.strptime(quote['tradedDate'], '%d%b%Y').date()
-        return {'date': date, 'price': price}
-
-    def parse_response(self, response):
-        for line in response.iter_lines():
-            line = line.decode('ascii')
-            if '{"futLink":"' not in line:
-                continue
-            data = json.loads(line)
-            return data
+            today = datetime.date.today()
+            start = today - datetime.timedelta(days=(365 * 1.5))
+            return (start, today)
+        today = datetime.date.today()
+        if price.date == today:
+            return None, None
+        start_date = price.date + datetime.timedelta(days=1)
+        return (start_date, today)
