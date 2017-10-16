@@ -1,29 +1,43 @@
 import React from 'react';
 import axios from 'axios';
 
-const List = props => {
-    const stocks = props.stocks.map((stock, i) => {
-        return <div key={i}><strong>{stock[0]}</strong> {stock[1]}</div>
-    })
-    return (
-        <div class="col-sm-6">
-            {stocks}
-        </div>
-    )
-}
-
 
 const Stocks = props => {
     if ( props.stocks.length == 0 ) return null;
-    const breakPoint = Math.ceil(props.stocks.length / 2);
-    const list_one = props.stocks.slice(0, breakPoint);
-    const list_two = props.stocks.slice(breakPoint);
+
+    const styles = {
+        table: {
+            maxWidth: '600px',
+            marginLeft: '3em',
+            marginTop: '2em'
+        }
+    }
+
+    const data = props.stocks.map((stock, i) => {
+        return (
+            <tr key={i}>
+                <td><a href="#">{stock.symbol}</a></td>
+                <td>{stock.gain}%</td>
+                <td>{stock.qty}</td>
+                <td>{stock.delivery}%</td>
+            </tr>
+        )
+    })
 
     return (
-        <div class="row">
-            <List stocks={list_one} />
-            <List stocks={list_two} />
-        </div>
+        <table class="table table-striped" style={styles.table}>
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Gain %age</th>
+                    <th>Trade Qty</th>
+                    <th>Delivery %age</th>
+                </tr>
+            </thead>
+            <tbody>
+                {data}
+            </tbody>
+        </table>
     )
 }
 

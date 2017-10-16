@@ -83,5 +83,14 @@ def gains(request):
         gain = round((price_new / price_old - 1) * 100, 2)
         gains[stock] = gain
 
-    data = list((k, gains[k]) for k in sorted(gains, key=gains.get, reverse=True))
+    data = {k: gains[k]for k in sorted(gains, key=gains.get, reverse=True)}
+    prices = Price.objects.filter(date=last_trade_date)
+    prices_data = {entry.stock_id: entry for entry in prices}
+
+    data, _data = [], data
+    for symbol in _data:
+        price = prices_data[symbol]
+        data.append({'symbol': symbol, 'gain': _data[symbol],
+                     'qty': '{:,}'.format(price.quantity), 'delivery': price.delivery})
+
     return JsonResponse(data, safe=False)
