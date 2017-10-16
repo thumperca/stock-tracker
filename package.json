@@ -5,16 +5,13 @@
   "private": true,
   "main": "react/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run build",
+    "build": "webpack -d --watch",
+    "build:prod": "webpack -p"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thumperca/stock-tracker.git"
-  },
-  "scripts": {
-    "start": "npm run build",
-    "build": "webpack -d --watch",
-    "build:prod": "webpack -p"
   },
   "author": "Manvir Singh",
   "license": "ISC",
@@ -25,7 +22,11 @@
   "dependencies": {
     "axios": "^0.15.3",
     "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react-dom": "^15.4.2",
+    "react-redux": "^5.0.6",
+    "react-router": "^3.0.2",
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6"
   },
   "devDependencies": {
     "babel-core": "^6.23.1",
