@@ -7,8 +7,6 @@ const Stocks = props => {
 
     const styles = {
         table: {
-            maxWidth: '600px',
-            marginLeft: '3em',
             marginTop: '2em'
         }
     }
@@ -26,19 +24,21 @@ const Stocks = props => {
     })
 
     return (
-        <table class="table table-striped" style={styles.table}>
-            <thead>
-                <tr>
-                    <th>Symbol</th>
-                    <th>Gain %age</th>
-                    <th>Trade Qty</th>
-                    <th>Delivery %age</th>
-                </tr>
-            </thead>
-            <tbody>
-                {data}
-            </tbody>
-        </table>
+        <div class="col-md-8 col-md-offset-2">
+            <table class="table table-striped" style={styles.table}>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Gain %age</th>
+                        <th>Trade Qty</th>
+                        <th>Delivery %age</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data}
+                </tbody>
+            </table>
+        </div>
     )
 }
 
@@ -88,7 +88,7 @@ export default class Gains extends React.Component {
 
         return (
             <div class="container">
-                <h2>Stocks below moving average</h2>
+                <h2 class="text-center">Top gaining stocks</h2>
                 <ul class="nav nav-tabs" role="tablist">
                     {tabs}
                 </ul>

@@ -29,6 +29,24 @@ def stock(request, symbol):
         stock = Stock.objects.get(pk=symbol)
     except Stock.DoesNotExist:
         return JsonResponse({'failed': True}, status=404)
+    db_data = Price.objects.filter(stock=stock).order_by('-date')[:22]
+    data = []
+    for entry in db_data:
+        data.append({
+            'date': str(entry.date),
+            'quantity': '{:,}'.format(entry.quantity),
+            'delivery': entry.delivery,
+            'price': float(entry.price)
+        })
+    return JsonResponse(data, safe=False)
+
+
+def ema(request, symbol):
+    """Exponential Moving Average for a stock"""
+    try:
+        stock = Stock.objects.get(pk=symbol)
+    except Stock.DoesNotExist:
+        return JsonResponse({'failed': True}, status=404)
     stats = stock.get_graph(period=request.GET.get('t'))
     return JsonResponse(stats)
 

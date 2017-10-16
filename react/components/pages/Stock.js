@@ -14,7 +14,7 @@ class Graph extends React.Component {
         const { stock } = props;
         if ( !stock ) return;
         this.setState({loading: true});
-        axios.get(`/api/stock/${stock}/?t=${this.state.period}`).then(res => {
+        axios.get(`/api/ema/${stock}/?t=${this.state.period}`).then(res => {
             this.setState({loading: false});
             this.loadGraph(res.data)
         })
@@ -103,6 +103,53 @@ class Graph extends React.Component {
 }
 
 
+const List = props => {
+    const data = props.data.map((entry, i) => {
+        return <div key={i}>{entry[props.field]}</div>
+    })
+    return (
+        <div>{data}</div>
+    )
+}
+
+
+const Table = props => {
+    if ( props.data.length == 0 ) return null;
+
+    const styles = {
+        table: {
+            marginTop: '2em'
+        }
+    }
+
+    const data = props.data.map((stock, i) => {
+        return (
+            <tr key={i}>
+                <td>{stock.date}</td>
+                <td>{stock.price}</td>
+                <td>{stock.quantity}</td>
+                <td>{stock.delivery}</td>
+            </tr>
+        )
+    })
+
+    return (
+        <table class="table table-striped" style={styles.table}>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Trade Qty</th>
+                    <th>Delivery %age</th>
+                </tr>
+            </thead>
+            <tbody>
+                {data}
+            </tbody>
+        </table>
+    )
+}
+
 
 export default class Stock extends React.Component {
 
@@ -110,33 +157,36 @@ export default class Stock extends React.Component {
         super(props);
         this.state = {
             symbol: props.routeParams.symbol,
-            loading: false
+            loading: false,
+            data: []
         }
     }
 
     componentDidMount() {
-        // const url = `/api/stock/${this.state.symbol}/?t=${this.state.period}`;
-        // axios.get(url).then(res => {
-        //     console.log(res.data);
-        // })
+        const url = `/api/stock/${this.state.symbol}/`;
+        axios.get(url).then(res => this.setState({data: res.data}));
     }
 
     render() {
-        console.log('state is', this.state);
-        if ( !this.state.symbol ) return null;
-
+        const { symbol, data } = this.state;
+        if ( !symbol ) return null;
         return (
             <div class="container">
-                <h4 class="text-center">Stock: {this.props.routeParams.symbol}</h4>
+                <h4 class="text-center">Stock: {symbol}</h4>
                 <div class="row">
                     <div class="col-md-1">
                         <h5>Qty</h5>
+                        <List data={data} field="quantity" />
                     </div>
                     <div class="col-md-10">
-                        <Graph stock={this.state.symbol} />
+                        <Graph stock={symbol} />
                     </div>
                     <div class="col-md-1">
                         <h5>Delivery</h5>
+                        <List data={data} field="delivery" />
+                    </div>
+                    <div class="col-md-8 col-md-offset-2">
+                        <Table data={data} />
                     </div>
                 </div>
             </div>
