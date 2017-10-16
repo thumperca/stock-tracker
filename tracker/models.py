@@ -25,3 +25,5 @@ class Price(models.Model):
     date = models.DateField()
     price = models.DecimalField(max_digits=9, decimal_places=2)
     quantity = models.IntegerField(default=0)
+    delivery = models.DecimalField(max_digits=6, decimal_places=2, null=True)
+
