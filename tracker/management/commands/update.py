@@ -150,6 +150,7 @@ class Command(ArchiveProcessor, BaseCommand):
             print('\nprocessing date', date)
             self.import_archive(date)
             date += datetime.timedelta(days=1)
+        self.delete_old()
 
     def get_dates(self):
         try:
@@ -163,3 +164,7 @@ class Command(ArchiveProcessor, BaseCommand):
             return None, None
         start_date = price.date + datetime.timedelta(days=1)
         return (start_date, today)
+
+    def delete_old(self):
+        limit = datetime.date.today() - datetime.timedelta(days=730)
+        Price.objects.filter(date__lt=limit).delete()
