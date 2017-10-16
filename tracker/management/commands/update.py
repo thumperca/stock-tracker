@@ -20,17 +20,17 @@ from django.core.management.base import BaseCommand
 from tracker.models import Stock, Price
 
 
-class ArchiveReader(object):
+class URLReader(object):
 
-    def read_archive(self, date):
-        url = self.get_url(date)
+    def read_archive(self, date, file_type):
+        url = self.get_url(date, file_type)
         if not url:
             return
-        return self.read_url(url)
+        return self.read_url(url, file_type)
 
-    def get_url(self, date):
-        url = ('https://www.nseindia.com/ArchieveSearch?h_filetype=eqbhav'
-               '&date={}&section=EQ'.format(date.strftime('%d-%m-%Y')))
+    def get_url(self, date, file_type):
+        url = ('https://www.nseindia.com/ArchieveSearch?h_filetype={}'
+               '&date={}&section=EQ'.format(file_type, date.strftime('%d-%m-%Y')))
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         anchor = soup.find('a')
@@ -39,7 +39,13 @@ class ArchiveReader(object):
             return
         return 'https://www.nseindia.com' + anchor['href']
 
-    def read_url(self, url):
+    def read_url(self, url, file_type):
+        if file_type == 'eqbhav':
+            return self._read_zip(url)
+        elif file_type == 'eqmto':
+            return self._read_dat(url)
+
+    def _read_zip(self, url):
         filename = url.split('/')[-1].replace('.zip', '')
         response = requests.get(url)
         try:
@@ -52,14 +58,46 @@ class ArchiveReader(object):
         else:
             return data
 
+    def _read_dat(self, url):
+        response = requests.get(url)
+        data = response.content.decode('utf-8').split('\n')
+        return data
 
-class ArchiveImporter(ArchiveReader):
+
+class DeliveryImporter(URLReader):
+
+    def import_delivery(self, date):
+        data = self.read_archive(date, file_type='eqmto')
+        self._import_data(date, data)
+
+    def _import_data(self, date, data):
+        for stock in self._read_data(data):
+            symbol = stock.pop('symbol')
+            Price.objects.filter(stock_id=symbol, date=date).update(**stock)
+
+    def _read_data(self, data):
+        for stock in data:
+            stock = stock.split(',')
+            if len(stock) < 7:
+                continue
+            if stock[3] != 'EQ':
+                continue
+            data = {
+                'symbol': stock[2],
+                'delivery': float(stock[6]),
+                'quantity': int(stock[4]),
+            }
+            yield data
+
+
+class ArchiveImporter(DeliveryImporter):
 
     def import_archive(self, date):
-        dataset = self.read_archive(date)
+        dataset = self.read_archive(date, file_type='eqbhav')
         if dataset is None:
             return
         self.import_data(date, dataset)
+        self.import_delivery(date)
 
     def import_data(self, date, dataset):
         stocks, data = [], []
