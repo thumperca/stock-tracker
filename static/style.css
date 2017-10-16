@@ -79,14 +79,7 @@ h2 {
     width: 100px;
 }
 
-.modal-dialog {
-    width: 80% !important;
-}
 
-.modal h4 {
-    display: inline-block;
-}
-
-.modal button {
-    margin-left: 1em;
+.graph button {
+    margin-left: 8px;
 }

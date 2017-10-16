@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-import { connect } from 'react-redux';
 
 
 class Graph extends React.Component {
@@ -89,19 +88,55 @@ class Graph extends React.Component {
         const periods = periodOptions.map((period, i) => {
             const postfix = (this.state.period == period) ? 'primary' : 'default';
             const elmClass = 'btn btn-xs btn-' + postfix;
-            return (<button type="button" onClick={e => this.changePeriod(period)} class={elmClass}>{period}</button>);
+            return (<button key={i} type="button" onClick={e => this.changePeriod(period)} class={elmClass}>{period}</button>);
         })
 
         return (
-            <div class="modal fade in" style={{'display': 'block'}}>
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <button type="button" class="close" onClick={e => this.props.close()}>&times;</button>
-                            <h4>Graph for {stock} - </h4>
-                            { periods }
-                            <canvas id="chart"></canvas>
-                        </div>
+            <div class="graph">
+                { periods }
+                <canvas id="chart"></canvas>
+            </div>
+
+        )
+    }
+
+}
+
+
+
+export default class Stock extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            symbol: props.routeParams.symbol,
+            loading: false
+        }
+    }
+
+    componentDidMount() {
+        // const url = `/api/stock/${this.state.symbol}/?t=${this.state.period}`;
+        // axios.get(url).then(res => {
+        //     console.log(res.data);
+        // })
+    }
+
+    render() {
+        console.log('state is', this.state);
+        if ( !this.state.symbol ) return null;
+
+        return (
+            <div class="container">
+                <h4 class="text-center">Stock: {this.props.routeParams.symbol}</h4>
+                <div class="row">
+                    <div class="col-md-1">
+                        <h5>Qty</h5>
+                    </div>
+                    <div class="col-md-10">
+                        <Graph stock={this.state.symbol} />
+                    </div>
+                    <div class="col-md-1">
+                        <h5>Delivery</h5>
                     </div>
                 </div>
             </div>
@@ -109,16 +144,3 @@ class Graph extends React.Component {
     }
 
 }
-
-
-const mapStateToProps = state => {
-    return {stock: state.stock}
-}
-
-const mapDispatchToProps = dispatch => {
-    return {
-        close: e => dispatch({type: 'SELECT', payload: null})
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Graph)
