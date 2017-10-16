@@ -13,6 +13,7 @@ const Header = props => {
                 <div class="pull-right">
                    <Link to="/" activeClassName="active">Shortlist</Link>
                    <Link to="/screener" activeClassName="active">Screener</Link>
+                   <Link to="/gains" activeClassName="active">Gains</Link>
                    <Link to="/signals" activeClassName="active">Signals</Link>
                 </div>
             </div>

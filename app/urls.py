@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^api/stock/(?P<symbol>.*)/$', views.stock),
     url(r'^api/screener$', views.screener),
     url(r'^api/signals$', views.signals),
+    url(r'^api/gains$', views.gains),
     url(r'^', views.home),
 ]

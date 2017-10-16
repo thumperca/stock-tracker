@@ -8,6 +8,7 @@ import Graph from './shared/Graph';
 import Home from './pages/Home';
 import Screener from './pages/Screener';
 import Signals from './pages/Signals';
+import Gains from './pages/Gains';
 
 const BaseLayout = props => {
     return (
@@ -26,6 +27,7 @@ const App = props => {
                     <Route path="/" name="home" component={Home} />
                     <Route path="/screener" name="screener" component={Screener} />
                     <Route path="/signals" name="signals" component={Signals} />
+                    <Route path="/gains" name="gains" component={Gains} />
                 </Route>
         </Router>
     )
