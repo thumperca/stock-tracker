@@ -20,7 +20,7 @@ from tracker import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/stocks/$', views.stocks),
-    url(r'^api/stock/(?P<symbol>.*)/$', views.stock),
+    url(r'^api/stock/(?P<symbol>.*)/$', views.StockView.as_view()),
     url(r'^api/ema/(?P<symbol>.*)/$', views.ema),
     url(r'^api/screener$', views.screener),
     url(r'^api/signals$', views.signals),

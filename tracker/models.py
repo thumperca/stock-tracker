@@ -9,6 +9,8 @@ class Stock(models.Model, StockMixin):
     symbol = models.CharField(max_length=20, primary_key=True)
     last_price = models.DecimalField(max_digits=9, decimal_places=2, null=True)
     modified_on = models.DateField()
+    is_purchased = models.BooleanField(default=False)
+    is_watchlist = models.BooleanField(default=False)
 
     objects = StockManger()
 

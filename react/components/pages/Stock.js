@@ -2,6 +2,32 @@ import React from 'react';
 import axios from 'axios';
 
 
+const Track = props => {
+
+    let shortBtn, buyBtn;
+
+    if ( props.watchlist ) {
+        shortBtn = <button onClick={e => props.update({watchlist: false})} class="btn btn-xs btn-danger">Remove</button>
+    } else {
+        shortBtn = <button onClick={e => props.update({watchlist: true})} class="btn btn-xs btn-success">Add</button>
+    }
+
+    if ( props.purchased ) {
+        buyBtn = <button onClick={e => props.update({purchased: false})} class="btn btn-xs btn-danger">Sell</button>
+    } else {
+        buyBtn = <button onClick={e => props.update({purchased: true})} class="btn btn-xs btn-success">Buy</button>
+    }
+
+
+    return (
+        <div class="pull-right">
+            {shortBtn}
+            {buyBtn}
+        </div>
+    )
+
+}
+
 class Graph extends React.Component {
 
     constructor(props) {
@@ -11,17 +37,18 @@ class Graph extends React.Component {
 
     componentDidMount(props) {
         if ( !props ) props = this.props;
-        const { stock } = props;
-        if ( !stock ) return;
+        console.log(props);
+        const { symbol } = props;
+        if ( !symbol ) return;
         this.setState({loading: true});
-        axios.get(`/api/ema/${stock}/?t=${this.state.period}`).then(res => {
+        axios.get(`/api/ema/${symbol}/?t=${this.state.period}`).then(res => {
             this.setState({loading: false});
             this.loadGraph(res.data)
         })
     }
 
     componentWillReceiveProps(nextProps) {
-        if ( nextProps.stock == this.props.stock ) return;
+        if ( nextProps.symbol == this.props.symbol ) return;
         this.componentDidMount(nextProps);
     }
 
@@ -79,10 +106,8 @@ class Graph extends React.Component {
     }
 
     render() {
-        const { stock } = this.props;
-        if ( !stock ) return null;
-
-        if ( this.state.loading ) return null;
+        const { symbol } = this.props;
+        if ( !symbol || this.state.loading ) return null;
 
         const periodOptions = ['1W', '1M', '3M', '6M', '1Y', '2Y', 'Max'];
         const periods = periodOptions.map((period, i) => {
@@ -93,7 +118,10 @@ class Graph extends React.Component {
 
         return (
             <div class="graph">
-                { periods }
+                <div class="pull-left">
+                    { periods }
+                </div>
+                <Track {...this.props} />
                 <canvas id="chart"></canvas>
             </div>
 
@@ -156,20 +184,27 @@ export default class Stock extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            loading: true,
             symbol: props.routeParams.symbol,
-            loading: false,
+            purchased: null,
+            watchlist: null,
             data: []
         }
     }
 
     componentDidMount() {
         const url = `/api/stock/${this.state.symbol}/`;
-        axios.get(url).then(res => this.setState({data: res.data}));
+        axios.get(url).then(res => this.setState({...res.data, loading: false}));
+    }
+
+    update(data) {
+        const url = `/api/stock/${this.state.symbol}/`;
+        axios.post(url, data).then(res => this.setState({...res.data}));
     }
 
     render() {
-        const { symbol, data } = this.state;
-        if ( !symbol ) return null;
+        const { symbol, data, purchased, watchlist, loading } = this.state;
+        if ( !symbol || loading ) return null;
         return (
             <div class="container">
                 <h4 class="text-center">Stock: {symbol}</h4>
@@ -179,7 +214,7 @@ export default class Stock extends React.Component {
                         <List data={data} field="quantity" />
                     </div>
                     <div class="col-md-10">
-                        <Graph stock={symbol} />
+                        <Graph {...this.state} update={this.update.bind(this)} />
                     </div>
                     <div class="col-md-1">
                         <h5>Delivery</h5>

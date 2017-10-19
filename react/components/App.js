@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import Header from './shared/Header';
 
 import Home from './pages/Home';
+import MyStocks from './pages/MyStocks';
 import Screener from './pages/Screener';
 import Signals from './pages/Signals';
 import Gains from './pages/Gains';
@@ -24,6 +25,7 @@ const App = props => {
         <Router history={browserHistory}>
                 <Route component={BaseLayout}>
                     <Route path="/" name="home" component={Home} />
+                    <Route path="/my-stocks" name="home" component={MyStocks} />
                     <Route path="/screener" name="screener" component={Screener} />
                     <Route path="/signals" name="signals" component={Signals} />
                     <Route path="/gains" name="gains" component={Gains} />

@@ -1,10 +1,20 @@
+import json
 from datetime import timedelta
 
 from django.shortcuts import render
+from django.views import View
 from django.http import JsonResponse, HttpResponse
 
 from tracker.models import Stock, Price
 from tracker.utils import Signals, get_nearest_date, get_all_stocks
+
+
+class BaseView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            request.jsondata = json.loads(request.body.decode('utf-8'))
+        return super(BaseView, self).dispatch(request, *args, **kwargs)
 
 
 def home(request):
@@ -18,23 +28,46 @@ def stocks(request):
     return JsonResponse(data, safe=False)
 
 
-def stock(request, symbol):
+class StockView(BaseView):
     """Details for a stock"""
-    try:
-        stock = Stock.objects.get(pk=symbol)
-    except Stock.DoesNotExist:
-        return JsonResponse({'failed': True}, status=404)
 
-    db_data = Price.objects.filter(stock=stock).order_by('-date')[:22]
-    data = []
-    for entry in db_data:
-        data.append({
-            'date': str(entry.date),
-            'quantity': entry.format_qty,
-            'delivery': entry.delivery,
-            'price': float(entry.price),
-        })
-    return JsonResponse(data, safe=False)
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            request.stock = Stock.objects.get(pk=kwargs.get('symbol'))
+        except Stock.DoesNotExist:
+            return JsonResponse({'failed': True}, status=404)
+        return super(StockView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        db_data = Price.objects.filter(stock=request.stock).order_by('-date')[:22]
+        data = []
+        for entry in db_data:
+            data.append({
+                'date': str(entry.date),
+                'quantity': entry.format_qty,
+                'delivery': entry.delivery,
+                'price': float(entry.price),
+            })
+        response = {
+            'symbol': request.stock.symbol,
+            'purchased': request.stock.is_purchased,
+            'watchlist': request.stock.is_watchlist,
+            'data': data,
+        }
+        return JsonResponse(response)
+
+    def post(self, request, *args, **kwargs):
+        stock, data = request.stock, request.jsondata
+        if 'watchlist' in data:
+            stock.is_watchlist = data['watchlist']
+        if 'purchased' in data:
+            stock.is_purchased = data['purchased']
+        stock.save()
+        response = {
+            'watchlist': stock.is_watchlist,
+            'purchased': stock.is_purchased,
+        }
+        return JsonResponse(response)
 
 
 def ema(request, symbol):
