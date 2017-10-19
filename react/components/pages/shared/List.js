@@ -4,7 +4,12 @@ import { connect } from 'react-redux';
 
 
 //  Overview for a single stock
-const StockOverview = props => {
+export const Stock = props => {
+    const openUrl = symbol => {
+        const url = '/stock/' + symbol;
+        var win = window.open(url, '_blank');
+        win.focus();
+    }
     //  Stock statistics
     const stats = props.stats.map((stat, i) => {
         const elmClass = 'stat ' + stat.direction;
@@ -14,7 +19,7 @@ const StockOverview = props => {
     const className = props.className ? props.className : 'item col-sm-6';
     //  return JSX
     return (
-        <div class={className} onClick={e => props.select(props.symbol)}>
+        <div class={className} onClick={e => openUrl(props.symbol)}>
             <div class="symbol">{props.symbol}</div>
             { stats }
             {/*<div class="balance up">+300.64</div>*/}
@@ -22,13 +27,6 @@ const StockOverview = props => {
     )
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        select: stock => dispatch({type: 'SELECT', payload: stock})
-    }
-}
-
-export const Stock = connect(null, mapDispatchToProps)(StockOverview);
 
 
 const List = props => {

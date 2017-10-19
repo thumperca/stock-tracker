@@ -127,4 +127,60 @@ class Graph(EMAOperations):
 
 
 class StockMixin(Graph):
-    pass
+
+    def to_overview(self):
+        """Basic performance overview of a stock"""
+        orm = tracker.models.Price.objects
+        data = orm.filter(stock=self).order_by('date').values('price', 'date')
+        data = {entry['date'].strftime('%d-%m-%Y'): entry['price'] for entry in data}
+        return {
+            'symbol': self.symbol,
+            'stats': [
+                self._get_difference(data=data, months=3),
+                self._get_difference(data=data, months=6),
+                self._get_difference(data=data, months=12),
+            ]
+        }
+
+    def _get_difference(self, data, months):
+        """Returns stocks difference details between current price and historic price"""
+        if not len(data):
+            return {'months': months, 'direction': None}
+
+        price_now = self.__get_price(data, months=0)
+        price_old = self.__get_price(data, months)
+        if not price_now or not price_old:
+            return {'months': months, 'direction': None}
+
+        if price_now > price_old:
+            direction = 'up'
+            difference = round((price_now / price_old - 1) * 100, 1)
+        else:
+            direction = 'down'
+            difference = round((1 - price_now / price_old) * 100, 1)
+        return {'months': months, 'direction': direction, 'difference': difference}
+
+    def __get_price(self, data, months, offset=None):
+        """
+        Get price around a certain date
+
+        Args:
+            data: dictionary of stock prices where key is date and value is price
+            months: No. of months in past to get price for
+            offset: offset value if price for a certain date wasn't found in data dictionry
+
+        Returns:
+            The price stock was trading for provided months ago
+
+        """
+        difference = int(months * 365 / 12)
+        if offset:
+            if offset > 20:
+                return
+            difference += offset
+        target = date.today() - timedelta(days=difference)
+
+        try:
+            return data[target.strftime('%d-%m-%Y')]
+        except KeyError:
+            return self.__get_price(data, months, offset=((offset or 0) + 1))
