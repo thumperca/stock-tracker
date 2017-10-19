@@ -2,7 +2,56 @@ import React from 'React';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
-import List from './shared/List';
+
+
+const Table = props => {
+    if ( props.stocks.length == 0 ) return null;
+
+    const getDiff = (stock, key) => {
+        const diff = stock[key]
+        if ( diff.direction == 'up' ) {
+            return <span class="stat up">+{diff.difference}%</span>
+        } else if ( diff.direction == 'down' ) {
+            return <span class="stat down">-{diff.difference}%</span>
+        } else {
+            return ''
+        }
+    }
+
+    const data = props.stocks.map((stock, i) => {
+        const url = '/stock/' + stock.symbol;
+        return (
+            <tr key={i}>
+                <td><a target="_new" href={url}>{stock.symbol}</a></td>
+                <td>{getDiff(stock, '3m')}</td>
+                <td>{getDiff(stock, '6m')}</td>
+                <td>{getDiff(stock, '12m')}</td>
+                <td>{stock.price}</td>
+                <td>{stock.quantity}</td>
+                <td>{stock.delivery}</td>
+            </tr>
+        )
+    })
+
+    return (
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>3m</th>
+                    <th>6m</th>
+                    <th>12m</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Delivery</th>
+                </tr>
+            </thead>
+            <tbody>
+                {data}
+            </tbody>
+        </table>
+    )
+}
 
 
 export default class Home extends React.Component {
@@ -25,7 +74,7 @@ export default class Home extends React.Component {
     componentDidMount(props) {
         if ( !props ) props = this.props;
         this.setState({loading: true})
-        axios.get('/api/stocks?q='+props.page).then(res => {
+        axios.get('/api/stocks/').then(res => {
             this.setState({loading: false, stocks: res.data, all: res.data})
         })
     }
@@ -53,15 +102,17 @@ export default class Home extends React.Component {
     }
 
     render() {
-        const { stocks, loading } = this.state;
+        const { stocks, loading, all } = this.state;
         //  Page loading
         if ( loading ) return <h3>Loading...</h3>;
         //  Main JSX
         return (
             <div class="container">
-                <h2>Stocks in Shortlist</h2>
-                <input id="quick-search" onChange={e => this.search(e)} type="search" class="form-control" placeholder="Search..." />
-                <List stocks={stocks} />
+                <div class="col-md-8 col-md-offset-2">
+                    <h2>All Stocks ({all.length})</h2>
+                    <input id="quick-search" onChange={e => this.search(e)} type="search" class="form-control" placeholder="Search..." />
+                    <Table stocks={stocks} />
+                </div>
             </div>
         )
     }

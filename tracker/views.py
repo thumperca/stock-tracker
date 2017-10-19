@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 
 from tracker.models import Stock, Price
-from tracker.utils import Signals, get_nearest_date
+from tracker.utils import Signals, get_nearest_date, get_all_stocks
 
 
 def home(request):
@@ -14,12 +14,7 @@ def home(request):
 
 def stocks(request):
     """Get list of all stocks"""
-    stocks = Stock.objects.all()
-    #   Todo: enable under after making changes to DB
-    # if request.GET.get('q', '').lower() == 'portfolio':
-    #     stocks = stocks.filter(purchased=True)
-    stocks = stocks.order_by('symbol')
-    data = [stock.to_overview() for stock in stocks]
+    data = get_all_stocks()
     return JsonResponse(data, safe=False)
 
 
@@ -29,14 +24,15 @@ def stock(request, symbol):
         stock = Stock.objects.get(pk=symbol)
     except Stock.DoesNotExist:
         return JsonResponse({'failed': True}, status=404)
+
     db_data = Price.objects.filter(stock=stock).order_by('-date')[:22]
     data = []
     for entry in db_data:
         data.append({
             'date': str(entry.date),
-            'quantity': '{:,}'.format(entry.quantity),
+            'quantity': entry.format_qty,
             'delivery': entry.delivery,
-            'price': float(entry.price)
+            'price': float(entry.price),
         })
     return JsonResponse(data, safe=False)
 
@@ -109,6 +105,6 @@ def gains(request):
     for symbol in _data:
         price = prices_data[symbol]
         data.append({'symbol': symbol, 'gain': _data[symbol],
-                     'qty': '{:,}'.format(price.quantity), 'delivery': price.delivery})
+                     'qty': price.format_qty, 'delivery': price.delivery})
 
     return JsonResponse(data, safe=False)

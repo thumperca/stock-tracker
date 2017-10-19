@@ -57,11 +57,11 @@ h2 {
     background: #f6f6f6;
 }
 
-.list .up {
+.stat.up {
     color: green;
 }
 
-.list .down {
+.stat.down {
     color: red;
 }
 

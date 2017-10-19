@@ -4,7 +4,7 @@ Helper functions for dates periods
 from datetime import timedelta
 from tracker.models import Price
 
-TEST_STOCK = 'INFY'
+TEST_STOCK = 'RELIANCE'
 
 
 def get_nearest_date(date, retry=0):
@@ -17,3 +17,7 @@ def get_nearest_date(date, retry=0):
         return get_nearest_date(date, retry + 1)
     else:
         return price.date
+
+
+def get_last_trade_date():
+    return Price.objects.filter(stock_id=TEST_STOCK).order_by('-date')[0].date

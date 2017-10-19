@@ -27,3 +27,8 @@ class Price(models.Model):
     quantity = models.IntegerField(default=0)
     delivery = models.DecimalField(max_digits=6, decimal_places=2, null=True)
 
+    @property
+    def format_qty(self):
+        if not self.quantity:
+            return ''
+        return '{:,}'.format(self.quantity)
