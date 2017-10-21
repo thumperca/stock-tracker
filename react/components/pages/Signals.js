@@ -12,6 +12,7 @@ export default class Signals extends React.Component {
     }
 
     componentDidMount() {
+        document.title = 'Buy Signals';
         axios.get('/api/signals').then(res => this.setState({loading: false, stocks: res.data}))
     }
 

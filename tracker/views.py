@@ -6,7 +6,7 @@ from django.views import View
 from django.http import JsonResponse, HttpResponse
 
 from tracker.models import Stock, Price
-from tracker.utils import Signals, get_nearest_date, get_all_stocks
+from tracker.utils import Signals, get_nearest_date, get_all_stocks, get_my_stocks
 
 
 class BaseView(View):
@@ -140,4 +140,9 @@ def gains(request):
         data.append({'symbol': symbol, 'gain': _data[symbol],
                      'qty': price.format_qty, 'delivery': price.delivery})
 
+    return JsonResponse(data, safe=False)
+
+
+def mystocks(request):
+    data = get_my_stocks()
     return JsonResponse(data, safe=False)

@@ -23,6 +23,7 @@ const Track = props => {
         <div class="pull-right">
             {shortBtn}
             {buyBtn}
+            <a target="_blank" href={'https://www.google.co.in/search?q=nse%3A+'+props.symbol} class="btn btn-xs btn-info">Google</a>
         </div>
     )
 
@@ -193,6 +194,7 @@ export default class Stock extends React.Component {
     }
 
     componentDidMount() {
+        document.title = 'Stock: ' + this.state.symbol;
         const url = `/api/stock/${this.state.symbol}/`;
         axios.get(url).then(res => this.setState({...res.data, loading: false}));
     }

@@ -12,6 +12,7 @@ export default class Screener extends React.Component {
     }
 
     componentDidMount() {
+        document.title = 'EMA Screener';
         this.change(null, '200');
     }
 

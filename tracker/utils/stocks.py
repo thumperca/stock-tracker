@@ -61,3 +61,15 @@ def get_all_stocks():
     newlist = sorted(data, key=itemgetter('quantity'), reverse=True)
 
     return newlist
+
+
+def get_my_stocks():
+    stocks = Stock.objects.filter(is_watchlist=True).order_by('-is_purchased', 'symbol')
+    data = []
+    for stock in stocks:
+        data.append({
+            'symbol': stock.pk,
+            'price': float(stock.last_price),
+            'purchased': stock.is_purchased,
+        })
+    return data

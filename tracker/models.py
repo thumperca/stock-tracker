@@ -14,6 +14,9 @@ class Stock(models.Model, StockMixin):
 
     objects = StockManger()
 
+    def __str__(self):
+        return self.symbol
+
     def save(self, *args, **kwargs):
         date = kwargs.pop('modified_on', timezone.now().date())
         if type(date) is not datetime.date:

@@ -15,7 +15,7 @@ const Stocks = props => {
         const url = '/stock/' + stock.symbol;
         return (
             <tr key={i}>
-                <td><a target="_new" href={url}>{stock.symbol}</a></td>
+                <td><a target="_blank" href={url}>{stock.symbol}</a></td>
                 <td>{stock.gain}%</td>
                 <td>{stock.qty}</td>
                 <td>{stock.delivery}%</td>
@@ -51,6 +51,7 @@ export default class Gains extends React.Component {
     }
 
     componentDidMount() {
+        document.title = 'Gains';
         this.change(null, '3D');
     }
 

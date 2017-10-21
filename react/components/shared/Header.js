@@ -11,7 +11,8 @@ const Header = props => {
                     <img src="/static/logo.png" />
                 </div>
                 <div class="pull-right">
-                   <Link to="/" activeClassName="active">Shortlist</Link>
+                   <Link to="/" activeClassName="active">Home</Link>
+                   <Link to="/my-stocks" activeClassName="active">My Stocks</Link>
                    <Link to="/screener" activeClassName="active">Screener</Link>
                    <Link to="/gains" activeClassName="active">Gains</Link>
                    <Link to="/signals" activeClassName="active">Signals</Link>

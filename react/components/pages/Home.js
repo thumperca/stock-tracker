@@ -22,7 +22,7 @@ const Table = props => {
         const url = '/stock/' + stock.symbol;
         return (
             <tr key={i}>
-                <td><a target="_new" href={url}>{stock.symbol}</a></td>
+                <td><a target="_blank" href={url}>{stock.symbol}</a></td>
                 <td>{getDiff(stock, '3m')}</td>
                 <td>{getDiff(stock, '6m')}</td>
                 <td>{getDiff(stock, '12m')}</td>
@@ -72,6 +72,7 @@ export default class Home extends React.Component {
 
     //  load stocks on page load
     componentDidMount(props) {
+        document.title = 'Homepage';
         if ( !props ) props = this.props;
         this.setState({loading: true})
         axios.get('/api/stocks/').then(res => {
